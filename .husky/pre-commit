@@ -1,0 +1,12 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+set -e
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR)
+
+pnpm run lint:fix
+pnpm run lint
+pnpm run prettier:write
+
+echo "$STAGED_FILES" | xargs git add
