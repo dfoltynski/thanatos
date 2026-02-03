@@ -3,9 +3,14 @@ import { Request, Response } from "express";
 import {
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
-} from "../../../environment-variables";
+} from "../../../../environment-variables";
+import { TypedRequest } from "../../../../shared/middlewares/zod/validate-schema";
+import { GithubOAuthPayload } from "./github.validators";
 
-export const authorizeGithubCode = async (req: Request, res: Response) => {
+export const authorizeGithubCode = async (
+  req: TypedRequest<GithubOAuthPayload>,
+  res: Response,
+) => {
   const { code, redirect_uri } = req.body;
   try {
     const tokenRes = await axios.post(
@@ -35,12 +40,10 @@ export const authorizeGithubCode = async (req: Request, res: Response) => {
         .json({ error: "github_exchange_failed", details: tokenJson });
     }
 
-    return res
-      .status(200)
-      .json({
-        access_token: tokenJson.access_token,
-        token_type: tokenJson.token_type,
-      });
+    return res.status(200).json({
+      access_token: tokenJson.access_token,
+      token_type: tokenJson.token_type,
+    });
   } catch (e: any) {
     return res.status(500).json({
       error: "github_exchange_error",
