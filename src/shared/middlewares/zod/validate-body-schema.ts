@@ -4,13 +4,15 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 export interface TypedRequest<T> extends Request {
   body: T;
 }
-export const validateSchema = <T extends z.ZodType>(
+export const validateBodySchema = <T extends z.ZodTypeAny>(
   schema: T,
 ): RequestHandler => {
-  return (req: TypedRequest<T>, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     try {
-      const payload = req.body;
-      schema.parse(payload);
+      const result = schema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json(result.error.issues);
+      }
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {

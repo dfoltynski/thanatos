@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticateUser } from "../../../shared/middlewares/auth/authenticate-user";
+import { validateQuerySchema } from "../../../shared/middlewares/zod/validate-query-schema";
 import { getHistory } from "./history.controller";
-import { validateSchema } from "../../../shared/middlewares/zod/validate-schema";
 import { HistoryPayloadSchema } from "./history.validators";
 
 const historyRouter = Router();
@@ -9,7 +9,7 @@ const historyRouter = Router();
 historyRouter.get(
   "/",
   authenticateUser,
-  validateSchema(HistoryPayloadSchema),
+  validateQuerySchema(HistoryPayloadSchema),
   getHistory,
 );
 

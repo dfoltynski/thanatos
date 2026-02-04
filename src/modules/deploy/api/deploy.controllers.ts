@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { TypedRequest } from "../../../shared/middlewares/zod/validate-schema";
+import { TypedRequest } from "../../../shared/middlewares/zod/validate-body-schema";
 import { getBranchData } from "../application/get-branch-data";
 import { DeployPayload } from "./deploy.validators";
 import { addDeployHistory } from "../../history/application/get-deploy-history";

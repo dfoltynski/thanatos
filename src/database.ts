@@ -1,9 +1,15 @@
 import { Pool } from "pg";
-
+import {
+  DATABASE,
+  DATABASE_PASSWORD,
+  DATABASE_USER,
+  defineEnvironmentVariables,
+} from "./environment-variables";
+defineEnvironmentVariables();
 const postgresClient = new Pool({
-  user: "postgres",
-  password: "mysecretpassword",
-  database: "charon",
+  user: DATABASE_USER,
+  password: DATABASE_PASSWORD,
+  database: DATABASE,
 });
 
 export default postgresClient;

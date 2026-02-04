@@ -1,8 +1,8 @@
 import * as z from "zod";
 
 export const GithubOAuthPayloadSchema = z.object({
-  code: z.string().min(0),
-  redirect_uri: z.string().min(0),
+  code: z.string().nonempty(),
+  redirect_uri: z.url().nonempty(),
 });
 
 export type GithubOAuthPayload = z.infer<typeof GithubOAuthPayloadSchema>;

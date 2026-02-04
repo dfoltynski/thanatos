@@ -7,6 +7,9 @@ declare module "node:process" {
         GITHUB_CLIENT_SECRET: string;
         GITHUB_TOKEN: string;
         GITHUB_ORGANIZATION_NAME: string;
+        DATABASE_USER: string;
+        DATABASE_PASSWORD: string;
+        DATABASE: string;
       }
     }
   }

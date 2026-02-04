@@ -4,7 +4,7 @@ import {
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
 } from "../../../../environment-variables";
-import { TypedRequest } from "../../../../shared/middlewares/zod/validate-schema";
+import { TypedRequest } from "../../../../shared/middlewares/zod/validate-body-schema";
 import { GithubOAuthPayload } from "./github.validators";
 
 export const authorizeGithubCode = async (
