@@ -1,6 +1,5 @@
-import z from "zod";
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import { ParsedQs } from "qs";
+import z from "zod";
 
 export interface TypedQueryRequest<T> extends Request<any, any, any, T> {
   query: T;

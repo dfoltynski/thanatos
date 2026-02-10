@@ -19,9 +19,9 @@ export const deployBranch = async (
     });
 
     const username = response.commit.committer.login;
-    console.log(JSON.stringify(response));
+    const commitSha = response.commit.sha.slice(0, 7);
     await addDeployHistory({
-      branchName,
+      commitSha,
       environment,
       projectName,
       username,

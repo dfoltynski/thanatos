@@ -7,8 +7,12 @@ export const getHistory = async (
   req: TypedQueryRequest<HistoryPayload>,
   res: Response,
 ) => {
-  const { environment } = req.query;
-  const history = await getDeployHistory({ environment });
+  const { environment, page, limit } = req.query;
+  const { history, count } = await getDeployHistory({
+    environment,
+    page: Number(page),
+    limit: Number(limit),
+  });
 
-  res.json({ history });
+  res.json({ history, count });
 };

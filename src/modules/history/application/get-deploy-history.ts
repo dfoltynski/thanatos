@@ -7,36 +7,40 @@ interface GetDeployHistoryDependencies {
 
 interface GetDeployHistoryParams {
   environment: Environment;
+  page: number;
+  limit: number;
   deps?: GetDeployHistoryDependencies;
 }
 
 export const getDeployHistory = async ({
   environment,
+  limit,
+  page,
   deps = { historyDb: new History() },
 }: GetDeployHistoryParams) => {
-  const { historyDb } = deps;
-  const history = await historyDb.getHistoryData(environment);
-  return history.rows as HistoryData[];
+  const history = await deps.historyDb.getHistoryData(environment, page, limit);
+  const count = await deps.historyDb.getHistoryLength(environment);
+
+  return { history: history as HistoryData[], count };
 };
 
 interface AddDeployHistoryParams {
   environment: Environment;
   username: string;
-  branchName: string;
+  commitSha: string;
   projectName: string;
   deps?: GetDeployHistoryDependencies;
 }
 
 export const addDeployHistory = async ({
-  branchName,
+  commitSha,
   environment,
   projectName,
   username,
   deps = { historyDb: new History() },
 }: AddDeployHistoryParams) => {
-  const { historyDb } = deps;
-  await historyDb.addHistoryData({
-    branchName,
+  await deps.historyDb.addHistoryData({
+    commitSha,
     environment,
     projectName,
     username,
