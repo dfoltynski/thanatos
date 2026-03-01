@@ -8,20 +8,81 @@ export interface HistoryData {
   projectName: string;
 }
 
+export type HistoryRow = {
+  id: string;
+  environment: string;
+  name: string | null;
+  time: string;
+  commitsha: string | null;
+  projectname: string | null;
+};
+
+export type HistoryCursor = {
+  time: string;
+  id: string;
+};
+
+export type HistoryResponse = {
+  history: HistoryRow[];
+  nextCursor: HistoryCursor | null;
+  hasMore: boolean;
+};
+
+const MAX_LIMIT = 50;
+
+function clampLimit(limit: unknown) {
+  const n = Number(limit);
+  if (!Number.isFinite(n) || n <= 0) return 10;
+  return Math.min(Math.floor(n), MAX_LIMIT);
+}
+
 export class History {
-  async getHistoryData(environment: string, page: number, limit: number) {
-    const keyset = await postgresClient.query(
-      `SELECT * FROM History ORDER BY id, time LIMIT $1`,
-      [limit * page],
+  async getHistoryData(
+    environment: string,
+    limit: unknown,
+    cursor?: HistoryCursor | null,
+  ): Promise<HistoryResponse> {
+    const safeLimit = clampLimit(limit);
+
+    const params: any[] = [environment, safeLimit];
+    let cursorSql = "";
+
+    if (cursor?.time && cursor?.id) {
+      params.push(cursor.time, cursor.id);
+      cursorSql = `AND (time, id) < ($3::timestamptz, $4::bigint)`;
+    }
+
+    const result = await postgresClient.query(
+      `
+      SELECT
+        id::text          AS id,
+        environment::text AS environment,
+        name,
+        time::text        AS time,
+        commitsha,
+        projectname
+      FROM history
+      WHERE environment = $1
+        ${cursorSql}
+      ORDER BY time DESC, id DESC
+      LIMIT $2
+      `,
+      params,
     );
 
-    const lastItem = keyset.rows.at(-1);
+    const rows = result.rows as HistoryRow[];
+    const last = rows.at(-1);
 
-    const history = await postgresClient.query(
-      `SELECT * FROM History WHERE Environment = $1 AND (id, time) > ($2, $3) ORDER BY id, time LIMIT $4`,
-      [environment, lastItem.id, lastItem.time, limit],
-    );
-    return history.rows;
+    const nextCursor =
+      last?.time && last?.id
+        ? ({ time: String(last.time), id: String(last.id) } as HistoryCursor)
+        : null;
+
+    return {
+      history: rows,
+      nextCursor,
+      hasMore: rows.length === safeLimit,
+    };
   }
 
   async getHistoryLength(environment: string) {

@@ -14,8 +14,8 @@ export const validParsedQsNumber = z.string().refine((value) => {
 
 export const HistoryPayloadSchema = z.object({
   environment: z.enum(["preview", "staging"]),
-  page: validParsedQsNumber,
   limit: validParsedQsNumber,
+  cursor: z.string().optional(),
 });
 
 export type HistoryPayload = z.infer<typeof HistoryPayloadSchema>;
