@@ -655,8 +655,6 @@ func HandleCliError(err error) {
 	os.Exit(1)
 }
 func makeContainerName(env, repo, branch string) string {
-	// preview: many branch deployments
-	// staging: one per repo (latest wins)
 	if env == "preview" {
 		return fmt.Sprintf("%s-%s-%s", env, sanitize(repo), sanitize(branch))
 	}
