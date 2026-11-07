@@ -1,21 +1,21 @@
 # thanatos
 
-Backend for a small deploy manager, built for my engineering degree. Give it a repository, a branch and an environment, and it builds that commit into a Docker image and runs it as a container on the host.
+Deployment orchestrator that turns a repository, branch and environment into a running container. A TypeScript API handles authentication, validation and deploy history. A Go engine does the deploy, driving the Docker Engine API directly rather than the Docker CLI.
 
-The API is TypeScript. The deploy itself is a Go CLI that talks to the Docker Engine API directly. [charon](https://github.com/dfoltynski/charon) is the frontend, and [solaris](https://github.com/dfoltynski/solaris) is a minimal app used as a deploy target.
+[charon](https://github.com/dfoltynski/charon) is the operator console, and [solaris](https://github.com/dfoltynski/solaris) is the test target. Designed and built for my engineering degree.
 
 ## How a deploy works
 
 ```mermaid
 flowchart LR
     UI[charon] -->|POST /deploy| API[Express API]
-    API -->|spawn| CLI[Go jobs CLI]
+    API -->|spawn| CLI[Go deploy engine]
     CLI -->|resolve SHA, clone| GH[GitHub]
     CLI -->|build, create, start| D[Docker Engine]
     API --> DB[(PostgreSQL history)]
 ```
 
-The Go CLI:
+The Go engine:
 
 1. Takes an exclusive `flock` per environment, repo and branch, so concurrent deploys of the same target run one at a time.
 2. Creates the Docker network for the environment if it is missing.
@@ -28,7 +28,7 @@ The Go CLI:
 ## Stack
 
 - **API:** Node.js, Express, Zod, Passport (GitHub OAuth), PostgreSQL
-- **Deploy job:** Go, Cobra, Moby client
+- **Deploy engine:** Go, Cobra, Moby client
 - **Tooling:** TypeScript, ESLint, Prettier, Husky
 
 ## Run it
@@ -42,11 +42,17 @@ pnpm install
 pnpm dev
 ```
 
-## Known limits
+## Design decisions
 
-This was built for my engineering degree, and these are the next things I would change:
+- **Commit-pinned builds.** The branch resolves to a SHA before cloning, so a deploy builds one exact commit even if the branch moves. Image tags and container labels record what is running.
+- **Serialized deploys per target.** A kernel `flock` keyed on environment, repo and branch queues concurrent deploys of the same target, and the kernel releases it if the process dies.
+- **Environment isolation.** Each environment gets its own Docker network.
+- **Readiness gating.** A deploy only counts once the container is running and its port accepts TCP connections. On failure, the engine returns the tail of the container logs.
+- **Separate deploy engine.** Builds run in a Go process outside the API, so the Node.js event loop stays free during long image builds.
 
-- It runs on a single host, and the lock is a local file, so two hosts could deploy the same target at once.
-- Replacing the old container before the new one is healthy means a short outage, and a failed deploy has no rollback. Blue-green would fix both.
-- The health check only proves that the port accepts connections, not that the app works.
-- There are no automated tests yet.
+## Roadmap
+
+- Blue-green deploys with automatic rollback, to remove the replacement gap
+- Distributed locking for multi-host deployments
+- Application-level health probes alongside the TCP check
+- Automated test suite
