@@ -22,6 +22,25 @@ export class GithubApi {
     return response;
   }
 
+  async getRepositories() {
+    try {
+      const owner = GITHUB_ORGANIZATION_NAME;
+      const repositories = await this.call(`/users/${owner}/repos`);
+
+      return repositories;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new InfraError(error.response!.statusText, {
+          status: error.response!.status,
+        });
+      }
+
+      throw new InfraError("Unexpected infrastructure error", {
+        status: 500,
+      });
+    }
+  }
+
   async getBranchData({ branch, repo }: GetBranchDataParams) {
     try {
       const owner = GITHUB_ORGANIZATION_NAME;
