@@ -16,7 +16,6 @@ var rootCmd = &cobra.Command{
 	Short: "Run and manage containers",
 	Long:  `Run and manage new container created in specified environment`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("asdasd")
 		branch, branchErr := cmd.Flags().GetString("branch")
 		HandleCliError(branchErr)
 		repo, repoErr := cmd.Flags().GetString("repo")
@@ -28,7 +27,8 @@ var rootCmd = &cobra.Command{
 		}
 		ctx := context.Background()
 
-		Deploy(ctx, repo, branch, env)
+		_, err := Deploy(ctx, repo, branch, env)
+		HandleCliError(err)
 	},
 }
 
