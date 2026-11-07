@@ -1,6 +1,6 @@
 # thanatos
 
-Backend for a small deploy manager. Give it a repository, a branch and an environment, and it builds that commit into a Docker image and runs it as a container on the host.
+Backend for a small deploy manager, built for my engineering degree. Give it a repository, a branch and an environment, and it builds that commit into a Docker image and runs it as a container on the host.
 
 The API is TypeScript. The deploy itself is a Go CLI that talks to the Docker Engine API directly. [charon](https://github.com/dfoltynski/charon) is the frontend, and [solaris](https://github.com/dfoltynski/solaris) is a minimal app used as a deploy target.
 
@@ -44,7 +44,7 @@ pnpm dev
 
 ## Known limits
 
-This is a personal project built to learn the problem space, and these are the next things I would change:
+This was built for my engineering degree, and these are the next things I would change:
 
 - It runs on a single host, and the lock is a local file, so two hosts could deploy the same target at once.
 - Replacing the old container before the new one is healthy means a short outage, and a failed deploy has no rollback. Blue-green would fix both.
