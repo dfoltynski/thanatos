@@ -1,8 +1,8 @@
 # thanatos
 
-Deployment orchestrator that turns a repository, branch and environment into a running container. A TypeScript API handles authentication, validation and deploy history. A Go engine does the deploy, driving the Docker Engine API directly rather than the Docker CLI.
+Proof-of-concept deployment orchestrator that turns a repository, branch and environment into a running container. A TypeScript API handles authentication, validation and deploy history. A Go engine does the deploy, driving the Docker Engine API directly rather than the Docker CLI.
 
-[charon](https://github.com/dfoltynski/charon) is the operator console, and [solaris](https://github.com/dfoltynski/solaris) is the test target. Designed and built for my engineering degree.
+[charon](https://github.com/dfoltynski/charon) is the operator console, and [solaris](https://github.com/dfoltynski/solaris) is the test target. Designed and built for my engineering degree. It is a proof of concept, not a finished product.
 
 ## How a deploy works
 
